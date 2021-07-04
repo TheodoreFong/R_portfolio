@@ -1,25 +1,104 @@
 ---
 title: "Reproducible Research: Peer Assessment 1"
-output: 
+output:
   html_document:
     keep_md: true
 ---
 
 
 ## Loading and preprocessing the data
-
+```{r}
+unzip("activity.zip")
+activity <- read.csv2("activity.csv", sep=",")
+activity$steps <- as.numeric(as.character(activity$steps))
+activity$date <- as.Date(as.character(activity$date))
+activity$interval <- as.numeric(as.character(activity$interval))
+head(activity)
+```
 
 
 ## What is mean total number of steps taken per day?
+Total steps per day:
+```{r}
+stepsByDay <- aggregate(steps ~ date, activity, sum)
+mean(stepsByDay$steps)
+```
 
+```{r}
+hist(stepsByDay$steps,
+     ylim=range(0, 30),
+     main="Histogram of Steps per Day",
+     xlab="Steps per day")
+```
+
+Mean steps per day:
+```{r}
+mean(stepsByDay$steps)
+```
+
+Median steps per day:
+```{r}
+median(stepsByDay$steps)
+```
 
 
 ## What is the average daily activity pattern?
-
-
+Average day activity:
+```{r}
+stepsByInterval <- aggregate(steps ~ interval, activity, mean)
+plot.ts(stepsByInterval$interval, stepsByInterval$steps, xlab="Interval", xy.lines=TRUE, type="n", ylab = "Steps")
+```
+2. The 5-min interval around 8:15AM has the max number of steps.
 
 ## Imputing missing values
 
+Total number of missing values:
+```{r}
+length(which(is.na(activity$steps)))
+```
 
+Estimated missing values by filling with average across all days for the given interval
+```{r}
+filledActivity <- activity
+intervalMeans <- round(merge(activity, stepsByInterval, by.x="interval", by.y="interval")$steps.y)
+missingStepIndices <- which(is.na(activity$steps))
+filledActivity[missingStepIndices, 1] <- intervalMeans[missingStepIndices]
+filledStepsByDay <- aggregate(steps ~ date, filledActivity, sum)
+```
+
+```{r}
+hist(filledStepsByDay$steps,
+     ylim=range(0, 30),
+     main="Histogram of Steps per Day (missing values estimated)",
+     xlab="Steps per day")
+```
+
+Mean steps per day (missing values estimated):
+```{r}
+mean(filledStepsByDay$steps)
+```
+
+Median steps per day (missing values estimated):
+```{r}
+median(filledStepsByDay$steps)
+```
+
+Filling the missing values with estimates slightly increased mean and median steps per day.
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+```{r}
+dayOfWeek <- weekdays(activity$date)
+activity$kindOfDay <- as.factor(ifelse(dayOfWeek == "Saturday", "weekend", "weekday"))
+
+weekendActivity <- activity[activity$kindOfDay == "weekend", ]
+weekdayActivity <- activity[activity$kindOfDay == "weekday", ]
+
+par(mfrow=c(2,1), pin=c(5, 1.5))
+
+weekdayStepsByInterval <- aggregate(steps ~ interval, weekdayActivity, mean)
+plot.ts(weekdayStepsByInterval$interval, weekdayStepsByInterval$steps, xy.lines=TRUE, type="n", main="Weekday", ylab = "Steps", xlab="")
+
+weekendStepsByInterval <- aggregate(steps ~ interval, weekendActivity, mean)
+plot.ts(weekendStepsByInterval$interval, weekendStepsByInterval$steps, xy.lines=TRUE, type="n", main="Weekend", ylab = "Steps", xlab="")
+```
