@@ -14,4 +14,4 @@ The course project of [Getting and Cleaning Data] is to read in the ["Human Acti
 
 **The output of the R script is a tidy data set, [tidy_data.txt](tidy_data.txt).**
 
-**To understand more about each variables used in R script, you can read the data and the analysis in the [code book](CodeBook.md).**
+**To understand more about each variables used in R script, you can read the data and the analysis in the [code book](Codebook.md).**
