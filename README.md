@@ -1,3 +1,3 @@
 # R_portfolio
 
-This portfolio are some of my projects with R code.
+This portfolio has some of my projects using R code.
