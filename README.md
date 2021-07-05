@@ -1,3 +1,3 @@
 # R_portfolio
 
-This portfolio is a collection of works to demonstrate my capabilities to code in R.
+This portfolio are some of my projects with R code.
